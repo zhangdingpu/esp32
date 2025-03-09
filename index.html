@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Image Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MQTT Image Viewer</h1>
+        <img id="image" src="" alt="MQTT Image" />
+    </div>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script>
+        // Connect to MQTT Broker (mqttgo.io)
+        const mqttClient = mqtt.connect('wss://mqttgo.io:8084/mqtt'); // WebSocket connection
+
+        mqttClient.on('connect', function () {
+            console.log('Connected to MQTT');
+            // Subscribe to the topic where images will be published
+            mqttClient.subscribe('YouTopic/class205/pic', function (err) {
+                if (!err) {
+                    console.log('Subscribed to image topic');
+                } else {
+                    console.error('Subscription error: ' + err);
+                }
+            });
+        });
+
+        mqttClient.on('message', function (topic, message) {
+            if (topic === 'YouTopic/class205/pic') {
+                // Create a Blob from the message data
+                const blob = new Blob([message], { type: 'image/jpeg' });
+                const imageUrl = URL.createObjectURL(blob);
+                
+                // Update the image source to show the received image
+                document.getElementById('image').src = imageUrl;
+            }
+        });
+    </script>
+</body>
+</html>
 
