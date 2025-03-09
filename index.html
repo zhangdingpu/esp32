@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Image Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        #image {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1>MQTT 影像顯示</h1>
+<img id="image" src="" alt="MQTT影像">
+
+<script>
+    // MQTT 伺服器設置
+    const mqttServer = 'mqtt://mqttgo.io';
+    const topic = 'test123/123';
+
+    // 創建 MQTT 客戶端並連接
+    const client = mqtt.connect(mqttServer);
+
+    client.on('connect', () => {
+        console.log('已連接到 MQTT 伺服器');
+        // 訂閱影像主題
+        client.subscribe(topic, (err) => {
+            if (!err) {
+                console.log('已訂閱到影像主題');
+            } else {
+                console.log('訂閱錯誤: ', err);
+            }
+        });
+    });
+
+    // 當接收到影像數據時，顯示在網頁上
+    client.on('message', (topic, message) => {
+        if (topic === 'YouTopic/class205/pic') {
+            // 假設影像是以 Base64 編碼傳送的
+            const base64Image = 'data:image/jpeg;base64,' + message.toString('base64');
+            document.getElementById('image').src = base64Image;
+        }
+    });
+</script>
+
+</body>
+</html>
